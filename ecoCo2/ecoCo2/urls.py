@@ -16,6 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from emissions import views as emissions_views
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("co2_rates/", emissions_views.co2_interpollated_view),
+    path("co2_rates/seasonal/", emissions_views.co2_rate_seasonal_view),
+    path("co2_rates/week/", emissions_views.co2_rate_day_of_week_view),
 ]

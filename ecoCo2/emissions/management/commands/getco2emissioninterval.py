@@ -37,11 +37,16 @@ class Command(BaseCommand):
         timestamps = response.json()
         for timestamp in timestamps:
             dt = datetime.datetime.strptime(timestamp["datetime"], "%Y-%m-%dT%H:%M:%S")
-            co2_ts, created = Co2Timestamp.objects.get_or_create(
-                datetime=dt, defaults={"value": timestamp["co2_rate"]}
-            )
-            if not created:
-                co2_ts.value = timestamp["co2_rate"]
-                co2_ts.save()
+            
+            # Only add point if hourly
+            if dt.minute == 0:
+                co2_ts, created = Co2Timestamp.objects.get_or_create(
+                    datetime=dt, defaults={"value": timestamp["co2_rate"]}
+                )
+        
+                # if timestamp exists in database, make sure co2_rate is up-to-date
+                if not created:
+                    co2_ts.value = timestamp["co2_rate"]
+                    co2_ts.save()
 
         self.stdout.write(self.style.SUCCESS(f"Successfully put Co2 data"))
